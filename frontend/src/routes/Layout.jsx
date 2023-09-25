@@ -16,6 +16,7 @@ import Submission from "../pages/academics/Submission";
 import Micro from "../pages/projects/Micro";
 import Major from "../pages/projects/Major";
 import Attendance from "../pages/Attendance";
+import Myprofile from "../pages/Myprofile";
 
 function Layout() {
   return (
@@ -32,6 +33,7 @@ function Layout() {
             <Content>
               <Routes>
                 <Route exact path="/" element={<Homepage/>} />
+                <Route exact path="/myprofile" element={<Myprofile/>} />
                 <Route exact path="/calender" element={<Kalandar/>} />
                 <Route exact path="/announcements" element={<Announcements/>} />
                 <Route exact path="/leaderboard" element={<Leaderboard/>} />

@@ -7,7 +7,14 @@ import { SelectPicker } from "rsuite";
 import { Link } from "react-router-dom";
 import LinkIcon from "@rsuite/icons/legacy/Link";
 import { IconButton } from "rsuite";
+import { Tooltip, Whisper, Button, ButtonToolbar } from 'rsuite';
 
+
+const tooltip = (
+  <Tooltip>
+    This is a help <i>tooltip</i> .
+  </Tooltip>
+);
 const subjects = ["AJP", "EST", "OSY", "STE", "CSS"].map((item) => ({
   label: item,
   value: item,
@@ -40,15 +47,27 @@ function Ppt() {
             />
           </FlexboxGrid.Item>
           <FlexboxGrid.Item colspan={6} style={{ margin: "20px 10px" }}>
-            <Link to={createPdfRoute()}>
-              <IconButton
-                icon={<LinkIcon />}
-                style={{ width: "100%" }}
-                disabled={!createPdfRoute()}
-              >
-                Link
-              </IconButton>
-            </Link>
+          <ButtonToolbar>
+              {selectedSubject ? (
+                <IconButton
+                  icon={<LinkIcon />}
+                  style={{ width: "100%" }}
+                  disabled={!createPdfRoute()}
+                >
+                  Link
+                </IconButton>
+              ) : (
+                <Whisper placement="top" controlId="control-id-hover" trigger="hover" speaker={tooltip}>
+                  <IconButton
+                    icon={<LinkIcon />}
+                    style={{ width: "100%" }}
+                    disabled={!createPdfRoute()}
+                  >
+                    Link
+                  </IconButton>
+                </Whisper>
+              )}
+            </ButtonToolbar>
           </FlexboxGrid.Item>
         </FlexboxGrid>
       </div>

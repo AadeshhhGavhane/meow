@@ -1,11 +1,106 @@
-import React from 'react'
+import React, { useEffect, useState } from "react";
+import { Table, Loader } from "rsuite";
+import { useSelector } from "react-redux";
+import { Grid, Row, Col, Input } from "rsuite";
 
-function Micro() {
+const { Column, HeaderCell, Cell } = Table;
+
+function studentView() {
+  const { userInfo } = useSelector((state) => state.auth);
+  const [data, setData] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  let enrollmentNo = userInfo.data.user.enrollmentNo;
+
+  useEffect(() => {
+    fetch("http://localhost:8000/api/v1/users/fetch-micro-projects/telegram", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        // Add any other necessary headers here
+      },
+      body: JSON.stringify({
+        enrollmentNo,
+      }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        const projects = data.data;
+        const formattedData = Object.keys(projects).map((key) => ({
+          subject: key,
+          microProject: projects[key],
+        }));
+        setData(formattedData);
+        setIsLoading(false);
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+        setIsLoading(false);
+      });
+  }, []);
+
   return (
-    <div>
-      <h1>Microprojects Goes Here!!!</h1>
+    <div
+      style={{ display: "flex", justifyContent: "center", marginTop: "50px" }}
+    >
+      {isLoading ? (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            marginTop: "50px",
+          }}
+        >
+          <Loader center size="lg" content="Loading..." vertical />
+        </div>
+      ) : (
+        <Table data={data} height={400} width={600}>
+          <Column width={200} align="center">
+            <HeaderCell>Subject</HeaderCell>
+            <Cell dataKey="subject" />
+          </Column>
+
+          <Column width={400} align="center">
+            <HeaderCell>Micro Project</HeaderCell>
+            <Cell dataKey="microProject" />
+          </Column>
+        </Table>
+      )}
     </div>
-  )
+  );
 }
 
-export default Micro
+function teacherView() {
+  const { userInfo } = useSelector((state) => state.auth);
+  let teacher = userInfo.data.user.className;
+  return (
+    <Grid style={{ marginTop: "50px" }}>
+      <Row justify="center" align="middle">
+        <Col
+          xs={24}
+          sm={18}
+          md={16}
+          style={{ marginBottom: "10px", textAlign: "center" }}
+        >
+          <h6>FYCO, SYCO, TYCO Micro Projects:</h6>
+          <Input
+            readOnly
+            value="https://docs.google.com/spreadsheets/d/1XqieCLy--5XyDeb9diYiYwm9p-O-FDXDEON8h9WH7bc"
+          />
+        </Col>
+      </Row>
+    </Grid>
+  );
+}
+
+const Micro = () => {
+  const { userInfo } = useSelector((state) => state.auth);
+  let role = userInfo.data.user.role;
+  console.log("Role:", role); // Log the role to check its value
+  if(role === "teacher"){
+    return teacherView();
+  }else{
+    return studentView();
+  }
+};
+
+export default Micro;

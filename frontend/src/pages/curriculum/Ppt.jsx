@@ -15,7 +15,7 @@ const tooltip = (
     This is a help <i>tooltip</i> .
   </Tooltip>
 );
-const subjects = ["AJP", "EST", "OSY", "STE", "CSS"].map((item) => ({
+const subjects = ["PWP","MAD","WBP"].map((item) => ({
   label: item,
   value: item,
 }));

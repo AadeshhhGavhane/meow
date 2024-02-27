@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useLoginMutation } from "../../slices/usersApiSlice";
-import { setCredentials } from "../../slices/authSlice";
+import { useConfirmAccountMutation } from "../../slices/usersApiSlice";
 import { Container, Content, Form, Button, FlexboxGrid, Panel } from "rsuite";
 import { Input, InputGroup } from "rsuite";
-import SearchIcon from "@rsuite/icons/Search";
 import AvatarIcon from "@rsuite/icons/legacy/Avatar";
 import EyeIcon from "@rsuite/icons/legacy/Eye";
 import EyeSlashIcon from "@rsuite/icons/legacy/EyeSlash";
@@ -19,7 +17,7 @@ const NavLink = React.forwardRef(({ href, children, ...rest }, ref) => (
   </Link>
 ));
 
-function Login() {
+function ConfirmAccount() {
   const styles = {
     marginBottom: 20,
   };
@@ -29,55 +27,51 @@ function Login() {
     setVisible(!visible);
   };
   const [enrollmentNo, setEnrollmentNo] = useState("");
-  const [password, setPassword] = useState("");
+  const [otp, setOtp] = useState("");
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const [login, { isLoading }] = useLoginMutation();
+  const [confirmAccount, { isLoading }] = useConfirmAccountMutation();
   const { userInfo } = useSelector((state) => state.auth);
-
-  useEffect(() => {
-    if (userInfo) {
-      navigate("/");
-    }
-  }, [navigate, userInfo]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     // Validate enrollmentNo length
     const enrollmentNoRegex = /^\d{10}$/;
     if (!enrollmentNoRegex.test(enrollmentNo)) {
       toast.error("Please enter a valid enrollment number (e.g., 2300070181)");
       return;
     }
-
-    // Add your password validation here (e.g., minimum length, special characters, etc.)
-    // Example: Password should be at least 8 characters long
-    if (password.length < 8) {
-      toast.error("Password must be at least 8 characters long");
+  
+    // Validate OTP length
+    const otpRegex = /^\d{6}$/;
+    if (!otpRegex.test(otp)) {
+      toast.error("Please enter a valid 6-digit OTP");
       return;
     }
 
-    const requestData = { enrollmentNo, password };
+    const requestData = { enrollmentNo, otp };
     try {
-      const res = await login(requestData).unwrap();
-      dispatch(setCredentials({ ...res }));
-      navigate("/");
+      const res = await confirmAccount(requestData).unwrap();
+      if (res.success) {
+        toast.success("User Verified Successfully");
+        navigate("/"); // Redirect after successful registration
+      }
     } catch (err) {
       if (err.originalStatus === 401) {
-        toast.error("Invalid EnrollmentNo or Password");
-      }
-      if (err.originalStatus === 403) {
-        toast.error("User Not Verified");
-        navigate("/confirm-account");
+        toast.error("Invalid OTP");
       }
       if (err.originalStatus === 404) {
         toast.error("User Does Not Exist, Sign Up Instead!");
       }
     }
+  
+    // Continue with your logic if enrollmentNo and OTP are valid
+    // Add your logic here...
   };
+  
 
   return (
     <Container>
@@ -87,7 +81,10 @@ function Login() {
             <Panel bordered>
               <FlexboxGrid justify="center">
                 <FlexboxGrid.Item style={styles}>
-                  <h3>Login</h3>
+                  <h3>Confirm Account</h3>
+                </FlexboxGrid.Item>
+                <FlexboxGrid.Item style={styles}>
+                  <p>Enter the OTP we sent on your email</p>
                 </FlexboxGrid.Item>
               </FlexboxGrid>
               <InputGroup style={styles}>
@@ -104,57 +101,24 @@ function Login() {
               <InputGroup inside style={styles}>
                 <Input
                   type={visible ? "text" : "password"}
-                  name="password"
-                  value={password}
-                  onChange={(value) => setPassword(value)}
-                  placeholder="Enter Password"
+                  name="otp"
+                  value={otp}
+                  onChange={(value) => setOtp(value)}
+                  placeholder="Enter OTP"
                 />
                 <InputGroup.Button onClick={handleChange}>
                   {visible ? <EyeIcon /> : <EyeSlashIcon />}
                 </InputGroup.Button>
               </InputGroup>
-              <FlexboxGrid justify="space-between">
+              <FlexboxGrid justify="center">
                 <FlexboxGrid.Item>
-                  {isLoading ? (
-                    <Button
-                      type="submit"
-                      onClick={handleSubmit}
-                      appearance="primary"
-                      loading
-                    >
-                      Login
-                    </Button>
-                  ) : (
-                    <Button
-                      type="submit"
-                      onClick={handleSubmit}
-                      appearance="primary"
-                    >
-                      Login
-                    </Button>
-                  )}
-                </FlexboxGrid.Item>
-                <FlexboxGrid.Item>
-                  {isLoading ? (
-                    <Button
-                      type="submit"
-                      appearance="ghost"
-                      as={NavLink}
-                      href="/forgot-password"
-                      disabled
-                    >
-                      Forgot Passowrd?
-                    </Button>
-                  ) : (
-                    <Button
-                      type="submit"
-                      appearance="ghost"
-                      as={NavLink}
-                      href="/forgot-password"
-                    >
-                      Forgot Passowrd?
-                    </Button>
-                  )}
+                  <Button
+                    type="submit"
+                    onClick={handleSubmit}
+                    appearance="primary"
+                  >
+                    Confirm Account
+                  </Button>
                 </FlexboxGrid.Item>
               </FlexboxGrid>
             </Panel>
@@ -165,4 +129,4 @@ function Login() {
   );
 }
 
-export default Login;
+export default ConfirmAccount;

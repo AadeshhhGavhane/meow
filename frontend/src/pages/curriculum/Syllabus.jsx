@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import LinkIcon from "@rsuite/icons/legacy/Link";
 import { IconButton, Tooltip, Whisper, Button, ButtonToolbar } from 'rsuite';
 
-const subjects = ["AJP", "EST", "OSY", "STE", "CSS"].map((item) => ({
+const subjects = ["PWP","MAD","WBP"].map((item) => ({
   label: item,
   value: item,
 }));

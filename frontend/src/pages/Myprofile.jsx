@@ -1,22 +1,53 @@
 import React, { useState } from "react";
-import { Button, Input, InputGroup } from "rsuite";
+import { Button, Input, InputGroup, Uploader, FlexboxGrid, Form } from "rsuite";
 import CloseOutlineIcon from "@rsuite/icons/CloseOutline";
 import CheckOutlineIcon from "@rsuite/icons/CheckOutline";
-import OthersIcon from "@rsuite/icons/Others";
 import EmailFillIcon from "@rsuite/icons/EmailFill";
 import PhoneFillIcon from "@rsuite/icons/PhoneFill";
 import AvatarIcon from "@rsuite/icons/legacy/Avatar";
-import { FlexboxGrid, Form } from "rsuite";
+import OthersIcon from "@rsuite/icons/Others";
 import { IconButton } from "rsuite";
 import FlexboxGridItem from "rsuite/esm/FlexboxGrid/FlexboxGridItem";
-const TextArea = React.forwardRef((props, ref) => (
-  <Input {...props} as="textarea" ref={ref} />
-));
-
-import { useSelector, useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { useUpdateAvatarMutation } from "../slices/usersApiSlice";
 
 function Myprofile() {
   const { userInfo } = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
+  const [avatarFile, setAvatarFile] = useState(null); // State to hold the uploaded avatar file
+  const [updateAvatarMutation] = useUpdateAvatarMutation();
+
+  const handleUploadChange = (file) => {
+    setAvatarFile(file[0]); // Set the uploaded file
+  };
+
+  const handleUpload = async () => {
+    try {
+      console.log("Uploading avatar...");
+      
+      if (!avatarFile) {
+        console.error("No avatar file selected.");
+        return;
+      }
+  
+      // Create FormData object and append the avatar file
+      const formData = new FormData();
+      formData.append("avatar", avatarFile);
+  
+      // Send avatar image using the mutation with FormData
+      await updateAvatarMutation(formData); 
+  
+      console.log("Avatar uploaded successfully!");
+      setAvatarFile(null);
+      // Optionally, you can dispatch actions or handle success message here
+    } catch (error) {
+      console.error("Error updating avatar:", error);
+      // Handle error appropriately
+    }
+  };
+  
+
+
   return (
     <>
       <div>
@@ -113,18 +144,26 @@ function Myprofile() {
             </InputGroup>
           </FlexboxGrid.Item>
         </FlexboxGrid>
-        {/* <FlexboxGrid justify="center">
+        <FlexboxGrid justify="center">
           <FlexboxGridItem colspan={4} style={{ margin: "20px 10px" }}>
-            <IconButton icon={<CheckOutlineIcon />} style={{ width: "100%" }}>
-              Update
-            </IconButton>
+            <Uploader
+              action="http://localhost:8000/api/v1/users/avatar"
+              listType="picture-text"
+              autoUpload={false}
+              onChange={handleUploadChange}
+              style={{ width: "100%" }}
+            >
+              <Button>
+                Upload Avatar
+              </Button>
+            </Uploader>
           </FlexboxGridItem>
           <FlexboxGridItem colspan={4} style={{ margin: "20px 10px" }}>
-            <IconButton icon={<CloseOutlineIcon />} style={{ width: "100%" }}>
-              Clear
-            </IconButton>
+            <Button onClick={handleUpload} style={{ width: "100%" }}>
+              Submit
+            </Button>
           </FlexboxGridItem>
-        </FlexboxGrid> */}
+        </FlexboxGrid>
       </div>
     </>
   );

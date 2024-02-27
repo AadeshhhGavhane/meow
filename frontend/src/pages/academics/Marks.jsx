@@ -17,6 +17,7 @@ function studentView() {
   const [marksData, setMarksData] = useState([]);
   const [loading, setLoading] = useState(false);
   let enrollmentNo = userInfo.data.user.enrollmentNo;
+  let className = userInfo.data.user.className[0];
 
   useEffect(() => {
     if (selectedTest) {
@@ -32,7 +33,7 @@ function studentView() {
     try {
       const response = await axios.post(
         "http://localhost:8000/api/v1/users/fetch-marks/telegram",
-        { enrollmentNo: enrollmentNo }
+        { enrollmentNo: enrollmentNo, className: className }
       );
       const data = response.data;
       if (data.success) {

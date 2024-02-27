@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Bar } from 'react-chartjs-2';
+import { useSelector } from "react-redux";
 
 import "./styles.css"
 
 const Leaderboard = () => {
+
+  const { userInfo } = useSelector((state) => state.auth);
+  let className = userInfo.data.user.className[0]
   const [ut1, setUt1] = useState([]);
   const [ut2, setUt2] = useState([]);
   const [topThreeStudents, setTopThreeStudents] = useState([]);
@@ -13,7 +17,8 @@ const Leaderboard = () => {
     const fetchData = async () => {
       try {
         const response = await axios.post('http://localhost:8000/api/v1/users/fetch-class-marks/telegram', {
-          phoneNo: 8097920998
+          phoneNo: 8097920998,
+          className: className
         });
         setUt1(response.data.data.data.ut1);
         setUt2(response.data.data.data.ut2);

@@ -5,7 +5,17 @@ import { useSelector, useDispatch } from "react-redux";
 
 import { Grid, Row, Col, Input } from 'rsuite';
 
-const subjects = ["PWP", "MAD", "WBP"].map((item) => ({
+const subjectsTYCO = ["PWP", "MAD", "WBP"].map((item) => ({
+  label: item,
+  value: item,
+}));
+
+const subjectsSYCO = ["JPR", "DCC", "GAD", "SEN"].map((item) => ({
+  label: item,
+  value: item,
+}));
+
+const subjectsFYCO = ["BEC", "EEC", "PIC"].map((item) => ({
   label: item,
   value: item,
 }));
@@ -15,6 +25,7 @@ const assprac = ["Assignments", "Practicals"].map((item) => ({
   value: item,
 }));
 
+
 function studentView(){
   
   const { userInfo } = useSelector((state) => state.auth);
@@ -22,6 +33,16 @@ function studentView(){
   const [selectedAssPrac, setSelectedAssPrac] = useState(null);
   const [marksData, setMarksData] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  // Determine subjects based on class name
+  let subjects = [];
+  if (userInfo.data.user.className.includes("FYCO")) {
+    subjects = subjectsFYCO;
+  } else if (userInfo.data.user.className.includes("SYCO")) {
+    subjects = subjectsSYCO;
+  } else if (userInfo.data.user.className.includes("TYCO")) {
+    subjects = subjectsTYCO;
+  }
 
   useEffect(() => {
     if (selectedSubject && selectedAssPrac) {
@@ -45,7 +66,8 @@ function studentView(){
       }
 
       let enrollmentNo = userInfo.data.user.enrollmentNo;
-      const response = await axios.post(url, {enrollmentNo: enrollmentNo});
+      let className = userInfo.data.user.className[0];
+      const response = await axios.post(url, {enrollmentNo: enrollmentNo, className: className});
       const data = response.data;
       console.log("Response data:", data); // Log response data
 
@@ -126,7 +148,7 @@ function studentView(){
           <FlexboxGrid.Item colspan={6} style={{ margin: "10px 10px" }}>
             <SelectPicker
               placeholder="Subject"
-              data={subjects}
+              data={subjects} // Use the dynamically determined subjects array
               value={selectedSubject}
               onChange={(value) => setSelectedSubject(value)}
               style={{ width: "100%" }}

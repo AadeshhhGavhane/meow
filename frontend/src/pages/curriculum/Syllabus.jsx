@@ -14,7 +14,7 @@ function Syllabus() {
 
   const createPdfRoute = () => {
     if (selectedSubject) {
-      return `/pdfs/syllabus/${selectedSubject}.pdf`;
+      return `/public/data/syllabus/${selectedSubject.toLowerCase()}.pdf`;
     }
     return "";
   };
@@ -24,6 +24,13 @@ function Syllabus() {
       Please Select the Subject
     </Tooltip>
   );
+
+  const handleLinkClick = () => {
+    const pdfRoute = createPdfRoute();
+    if (pdfRoute) {
+      window.open(pdfRoute, '_blank');
+    }
+  };
 
   return (
     <div>
@@ -41,9 +48,18 @@ function Syllabus() {
           />
         </FlexboxGrid.Item>
         <FlexboxGrid.Item colspan={6} style={{ margin: "20px 10px" }}>
-          <Link to={createPdfRoute()}>
-            <ButtonToolbar>
-              {selectedSubject ? (
+          <ButtonToolbar>
+            {selectedSubject ? (
+              <IconButton
+                icon={<LinkIcon />}
+                style={{ width: "100%" }}
+                onClick={handleLinkClick}
+                disabled={!createPdfRoute()}
+              >
+                Link
+              </IconButton>
+            ) : (
+              <Whisper placement="top" controlId="control-id-hover" trigger="hover" speaker={tooltip}>
                 <IconButton
                   icon={<LinkIcon />}
                   style={{ width: "100%" }}
@@ -51,19 +67,9 @@ function Syllabus() {
                 >
                   Link
                 </IconButton>
-              ) : (
-                <Whisper placement="top" controlId="control-id-hover" trigger="hover" speaker={tooltip}>
-                  <IconButton
-                    icon={<LinkIcon />}
-                    style={{ width: "100%" }}
-                    disabled={!createPdfRoute()}
-                  >
-                    Link
-                  </IconButton>
-                </Whisper>
-              )}
-            </ButtonToolbar>
-          </Link>
+              </Whisper>
+            )}
+          </ButtonToolbar>
         </FlexboxGrid.Item>
       </FlexboxGrid>
     </div>

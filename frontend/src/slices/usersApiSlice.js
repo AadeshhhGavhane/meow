@@ -59,7 +59,14 @@ export const usersApiSlice = apiSlice.injectEndpoints({
         body: data,
       }),
     }),
+    updateAvatar: builder.mutation({
+      query: (data) => ({
+        url: `${USERS_URL}/avatar`,
+        method: "PATCH",
+        body: data,
+      }),
+    }),
   }),
 });
 
-export const { useLoginMutation, useLogoutMutation, useRegisterMutation, useConfirmAccountMutation, useForgotPasswordMutation, useResetPasswordMutation, useChangeMarksMutation, useUpdateAccountMutation } = usersApiSlice;
+export const { useLoginMutation, useLogoutMutation, useRegisterMutation, useConfirmAccountMutation, useForgotPasswordMutation, useResetPasswordMutation, useChangeMarksMutation, useUpdateAccountMutation, useUpdateAvatarMutation } = usersApiSlice;

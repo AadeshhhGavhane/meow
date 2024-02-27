@@ -39,7 +39,7 @@ const CustomSidenav = ({
   const { userInfo } = useSelector((state) => state.auth);
   let className = userInfo.data.user.className[0];
   let role = userInfo.data.user.role;
-  console.log(className);
+  const shouldDisplayQuiz = role === "teacher" && userInfo.data.user.className.includes("TYCO");
   return (
     <div style={styles}>
       <Sidenav
@@ -59,7 +59,7 @@ const CustomSidenav = ({
             >
               Home
             </Nav.Item>
-            {userInfo.data.user.role === "teacher" && (
+            {shouldDisplayQuiz && (
               <Nav.Menu eventKey="9" title="Quiz" icon={<ReviewIcon />}>
                 <Nav.Item
                   as={NavLink}
@@ -69,8 +69,8 @@ const CustomSidenav = ({
                   Add Questions
                 </Nav.Item>
 
-                <Nav.Item as={NavLink} href="/quiz/see-stats" eventKey="9-2">
-                  See Stats
+                <Nav.Item as={NavLink} href="/quiz/see-quiz-results" eventKey="9-2">
+                  See Quiz Results
                 </Nav.Item>
               </Nav.Menu>
             )}
@@ -82,14 +82,14 @@ const CustomSidenav = ({
             >
               Calender
             </Nav.Item>
-            <Nav.Item
+            {/* <Nav.Item
               as={NavLink}
               href="/announcements"
               eventKey="3"
               icon={<SpeakerIcon />}
             >
               Announcements
-            </Nav.Item>
+            </Nav.Item> */}
             {userInfo.data.user.role === "student" && (
               <Nav.Item
                 as={NavLink}

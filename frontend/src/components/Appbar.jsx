@@ -42,10 +42,10 @@ function Appbar() {
         <Navbar.Brand as={NavLink} href="/">
           MeowMeowDashboard
         </Navbar.Brand>
-        <Nav>
+        {userInfo && <Nav>
           <Nav.Item href="http://localhost:3002">Compiler</Nav.Item>
           <Nav.Item href="http://localhost:3003">Quiz</Nav.Item>
-        </Nav>
+        </Nav>}
         {userInfo ? (
           <>
             <Nav pullRight>

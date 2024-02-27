@@ -1,21 +1,21 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import "../../styles.css";
-import { FlexboxGrid, Panel } from "rsuite";
-import { SelectPicker } from "rsuite";
-import { Link } from "react-router-dom";
+import { FlexboxGrid, SelectPicker } from "rsuite";
 import LinkIcon from "@rsuite/icons/legacy/Link";
-import { IconButton } from "rsuite";
-import { Tooltip, Whisper, Button, ButtonToolbar } from 'rsuite';
+import { IconButton, Tooltip, Whisper, ButtonToolbar } from 'rsuite';
+import { useNavigate } from "react-router-dom";
 
 const tooltip = (
   <Tooltip>
-    This is a help <i>tooltip</i> .
+    This is a help <i>tooltip</i>.
   </Tooltip>
 );
-const subjects = ["PWP","MAD","WBP"].map((item) => ({
+
+const subjects = ["PWP", "MAD", "WBP"].map((item) => ({
   label: item,
   value: item,
 }));
+
 const year = ["Sum22", "Win22", "Sum21", "Win21"].map((item) => ({
   label: item,
   value: item,
@@ -28,9 +28,16 @@ function Pyqma() {
   const createPdfRoute = () => {
     if (selectedSubject && selectedYear) {
       // Construct the PDF route based on selected values
-      return `/pdfs/pyqma/${selectedSubject}_${selectedYear}.pdf`;
+      return `/public/data/pyqma/${selectedSubject.toLowerCase()}/${selectedYear.toLowerCase()}.pdf`;
     }
     return ""; // Return an empty string if values are not selected
+  };
+
+  const handleLinkClick = () => {
+    const pdfRoute = createPdfRoute();
+    if (pdfRoute) {
+      window.open(pdfRoute, '_blank');
+    }
   };
 
   return (
@@ -56,27 +63,18 @@ function Pyqma() {
           />
         </FlexboxGrid.Item>
         <FlexboxGrid.Item colspan={6} style={{ margin: "20px 10px" }}>
-        <ButtonToolbar>
-              {selectedSubject ? (
-                <IconButton
-                  icon={<LinkIcon />}
-                  style={{ width: "100%" }}
-                  disabled={!createPdfRoute()}
-                >
-                  Link
-                </IconButton>
-              ) : (
-                <Whisper placement="top" controlId="control-id-hover" trigger="hover" speaker={tooltip}>
-                  <IconButton
-                    icon={<LinkIcon />}
-                    style={{ width: "100%" }}
-                    disabled={!createPdfRoute()}
-                  >
-                    Link
-                  </IconButton>
-                </Whisper>
-              )}
-            </ButtonToolbar>
+          <ButtonToolbar>
+            <Whisper placement="top" controlId="control-id-hover" trigger="hover" speaker={tooltip}>
+              <IconButton
+                icon={<LinkIcon />}
+                style={{ width: "100%" }}
+                onClick={handleLinkClick}
+                disabled={!createPdfRoute()}
+              >
+                Link
+              </IconButton>
+            </Whisper>
+          </ButtonToolbar>
         </FlexboxGrid.Item>
       </FlexboxGrid>
     </div>

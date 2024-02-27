@@ -25,7 +25,7 @@ import ChangePassword from "../pages/auth/ChangePassword";
 import ResetPassword from "../pages/auth/ResetPassword";
 import ConfirmAccount from "../pages/auth/ConfirmAccount";
 import AddQuestions from "../pages/quiz/Addquestions";
-import SeeStats from "../pages/quiz/SeeStats";
+import SeeStats from "../pages/quiz/SeeQuizResults";
 
 import "rsuite/dist/rsuite.min.css";
 import { CustomProvider } from "rsuite";
@@ -57,7 +57,7 @@ function Layout() {
                     {userInfo.data.user.role === "teacher" && (
                       <Route
                         exact
-                        path="/quiz/see-stats"
+                        path="/quiz/see-quiz-results"
                         element={<SeeStats />}
                       />
                     )}

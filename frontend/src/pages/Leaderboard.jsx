@@ -17,7 +17,7 @@ const Leaderboard = () => {
     const fetchData = async () => {
       try {
         const response = await axios.post('http://localhost:8000/api/v1/users/fetch-class-marks/telegram', {
-          phoneNo: 8097920998,
+          phoneNo: userInfo.data.user.phoneNo,
           className: className
         });
         setUt1(response.data.data.data.ut1);

@@ -10,43 +10,52 @@ import { IconButton } from "rsuite";
 import FlexboxGridItem from "rsuite/esm/FlexboxGrid/FlexboxGridItem";
 import { useDispatch, useSelector } from "react-redux";
 import { useUpdateAvatarMutation } from "../slices/usersApiSlice";
+import { setCredentials, updateAvatarUrl } from "../slices/authSlice";
+import { toast, ToastContainer } from "react-toastify";
 
 function Myprofile() {
   const { userInfo } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
-  const [avatarFile, setAvatarFile] = useState(null); // State to hold the uploaded avatar file
+  const [avatar, setAvatar] = useState(null); // State to store uploaded avatar
   const [updateAvatarMutation] = useUpdateAvatarMutation();
-
-  const handleUploadChange = (file) => {
-    setAvatarFile(file[0]); // Set the uploaded file
-  };
+  const [loading, setLoading] = useState(false);
 
   const handleUpload = async () => {
     try {
       console.log("Uploading avatar...");
-      
-      if (!avatarFile) {
+
+      if (!avatar) {
         console.error("No avatar file selected.");
         return;
       }
-  
+
       // Create FormData object and append the avatar file
       const formData = new FormData();
-      formData.append("avatar", avatarFile);
-  
-      // Send avatar image using the mutation with FormData
-      await updateAvatarMutation(formData); 
-  
+      formData.append("avatar", avatar);
+
+      // Log formData to check if the avatar file is correctly appended
+      console.log("FormData:", formData);
+
+      // Make the mutation request to update the avatar URL
+      const avatarUrl = await updateAvatarMutation(formData);
+
+      // Log the obtained avatar URL
+      console.log("Avatar URL:", avatarUrl.data.data);
+
+      // Dispatch action to update avatar URL in Redux state
+      dispatch(updateAvatarUrl(avatarUrl.data.data));
+
       console.log("Avatar uploaded successfully!");
-      setAvatarFile(null);
-      // Optionally, you can dispatch actions or handle success message here
+      setAvatar(null);
+      toast.success("Avatar uploaded successfully!");
     } catch (error) {
       console.error("Error updating avatar:", error);
-      // Handle error appropriately
+      toast.error("Error updating avatar. Please try again.");
+    } finally {
+      // Set loading state back to false whether upload succeeded or failed
+      setLoading(false);
     }
   };
-  
-
 
   return (
     <>
@@ -56,7 +65,7 @@ function Myprofile() {
           <FlexboxGrid.Item colspan={4} style={{ margin: "20px 10px" }}>
             <h6>Name :</h6>
             <InputGroup>
-              <Input value={userInfo.data.user.fullName} disabled/>
+              <Input value={userInfo.data.user.fullName} disabled />
               <InputGroup.Addon>
                 <AvatarIcon />
               </InputGroup.Addon>
@@ -74,7 +83,7 @@ function Myprofile() {
           <FlexboxGrid.Item colspan={4} style={{ margin: "20px 10px" }}>
             <h6>Phone/Telegram No:</h6>
             <InputGroup>
-              <Input value={userInfo.data.user.phoneNo} disabled/>
+              <Input value={userInfo.data.user.phoneNo} disabled />
               <InputGroup.Addon>
                 <PhoneFillIcon />
               </InputGroup.Addon>
@@ -83,7 +92,7 @@ function Myprofile() {
           <FlexboxGrid.Item colspan={4} style={{ margin: "20px 10px" }}>
             <h6>Roll No:</h6>
             <InputGroup>
-              <Input value={userInfo.data.user.rollNo} disabled/>
+              <Input value={userInfo.data.user.rollNo} disabled />
               <InputGroup.Addon>
                 <PhoneFillIcon />
               </InputGroup.Addon>
@@ -92,7 +101,7 @@ function Myprofile() {
           <FlexboxGrid.Item colspan={4} style={{ margin: "20px 10px" }}>
             <h6>Birth Date :</h6>
             <InputGroup>
-              <Input value={userInfo.data.user.birthDate} disabled/>
+              <Input value={userInfo.data.user.birthDate} disabled />
               <InputGroup.Addon>
                 <AvatarIcon />
               </InputGroup.Addon>
@@ -101,7 +110,7 @@ function Myprofile() {
           <FlexboxGrid.Item colspan={4} style={{ margin: "20px 10px" }}>
             <h6>Gender :</h6>
             <InputGroup>
-              <Input value={userInfo.data.user.gender} disabled/>
+              <Input value={userInfo.data.user.gender} disabled />
               <InputGroup.Addon>
                 <AvatarIcon />
               </InputGroup.Addon>
@@ -110,7 +119,7 @@ function Myprofile() {
           <FlexboxGrid.Item colspan={4} style={{ margin: "20px 10px" }}>
             <h6>Blood Group :</h6>
             <InputGroup>
-              <Input value={userInfo.data.user.blood} disabled/>
+              <Input value={userInfo.data.user.blood} disabled />
               <InputGroup.Addon>
                 <AvatarIcon />
               </InputGroup.Addon>
@@ -145,24 +154,28 @@ function Myprofile() {
           </FlexboxGrid.Item>
         </FlexboxGrid>
         <FlexboxGrid justify="center">
-          <FlexboxGridItem colspan={4} style={{ margin: "20px 10px" }}>
+          <FlexboxGrid.Item colspan={4} style={{ margin: "20px 10px" }}>
             <Uploader
-              action="http://localhost:8000/api/v1/users/avatar"
-              listType="picture-text"
               autoUpload={false}
-              onChange={handleUploadChange}
-              style={{ width: "100%" }}
+              fileListVisible={false}
+              onChange={(file) => {
+                if (file && file.length > 0) {
+                  const reader = new FileReader();
+                  reader.onload = (e) => {
+                    setAvatar(file[0].blobFile);
+                  };
+                  reader.readAsDataURL(file[0].blobFile);
+                }
+              }}
             >
-              <Button>
-                Upload Avatar
-              </Button>
+              <Button>Upload Avatar</Button>
             </Uploader>
-          </FlexboxGridItem>
-          <FlexboxGridItem colspan={4} style={{ margin: "20px 10px" }}>
-            <Button onClick={handleUpload} style={{ width: "100%" }}>
-              Submit
+          </FlexboxGrid.Item>
+          <FlexboxGrid.Item colspan={4} style={{ margin: "20px 10px" }}>
+            <Button disabled={loading} onClick={handleUpload}>
+              {loading ? "Uploading..." : "Submit"}
             </Button>
-          </FlexboxGridItem>
+          </FlexboxGrid.Item>
         </FlexboxGrid>
       </div>
     </>
